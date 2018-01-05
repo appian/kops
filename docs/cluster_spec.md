@@ -184,7 +184,7 @@ spec:
 
 ```
 
-### profiling flag
+#### profiling flag
 
 ```yaml
 spec:
@@ -280,6 +280,26 @@ Memory limit for apiserver in MB (used to configure sizes of caches, etc.)
 spec:
   kubeAPIServer:
     targetRamMb: 4096
+```
+
+#### Disable Basic Auth
+
+This will disable the passing of the `--basic-auth-file` flag.
+
+```yaml
+spec:
+  kubeAPIServer:
+    disableBasicAuth: true
+```
+
+#### Disable Token Auth
+
+This will disable the passing of the `--token-auth-file` flag.
+
+```yaml
+spec:
+  kubeAPIServer:
+    disableTokenAuth: true
 ```
 
 ### externalDns
