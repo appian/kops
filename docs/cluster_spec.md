@@ -159,7 +159,7 @@ spec:
 
 ```
 
-### profiling flag
+#### profiling flag
 
 ```yaml
 spec:
@@ -237,6 +237,26 @@ This value is passed as `--service-node-port-range` for `kube-apiserver`.
 spec:
   kubeAPIServer:
     serviceNodePortRange: 30000-33000
+```
+
+#### Disable Basic Auth
+
+This will disable the passing of the `--basic-auth-file` flag.
+
+```yaml
+spec:
+  kubeAPIServer:
+    disableBasicAuth: true
+```
+
+#### Disable Token Auth
+
+This will disable the passing of the `--token-auth-file` flag.
+
+```yaml
+spec:
+  kubeAPIServer:
+    disableTokenAuth: true
 ```
 
 ### externalDns
