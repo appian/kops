@@ -290,10 +290,6 @@ func (b *KubeAPIServerBuilder) buildPod() (*v1.Pod, error) {
 		kubeAPIServer.TokenAuthFile = filepath.Join(b.PathSrvKubernetes(), "known_tokens.csv")
 	}
 
-	if !kubeAPIServer.DisableBasicAuth {
-		kubeAPIServer.BasicAuthFile = filepath.Join(b.PathSrvKubernetes(), "basic_auth.csv")
-	}
-
 	if b.UseEtcdTLS() {
 		kubeAPIServer.EtcdCAFile = filepath.Join(b.PathSrvKubernetes(), "ca.crt")
 		kubeAPIServer.EtcdCertFile = filepath.Join(b.PathSrvKubernetes(), "etcd-client.pem")
