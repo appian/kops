@@ -2181,6 +2181,33 @@ func (in *KubeAPIServerConfig) DeepCopyInto(out *KubeAPIServerConfig) {
 			**out = **in
 		}
 	}
+	if in.Profiling != nil {
+		in, out := &in.Profiling, &out.Profiling
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(bool)
+			**out = **in
+		}
+	}
+	if in.ServiceAccountLookup != nil {
+		in, out := &in.ServiceAccountLookup, &out.ServiceAccountLookup
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(bool)
+			**out = **in
+		}
+	}
+	if in.RepairMalformedUpdates != nil {
+		in, out := &in.RepairMalformedUpdates, &out.RepairMalformedUpdates
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(bool)
+			**out = **in
+		}
+	}
 	return
 }
 
@@ -2342,6 +2369,15 @@ func (in *KubeControllerManagerConfig) DeepCopyInto(out *KubeControllerManagerCo
 		*out = make(map[string]string, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val
+		}
+	}
+	if in.Profiling != nil {
+		in, out := &in.Profiling, &out.Profiling
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(bool)
+			**out = **in
 		}
 	}
 	return
@@ -2826,6 +2862,42 @@ func (in *KubeletConfigSpec) DeepCopyInto(out *KubeletConfigSpec) {
 			*out = nil
 		} else {
 			*out = new(v1.Duration)
+			**out = **in
+		}
+	}
+	if in.EventQPS != nil {
+		in, out := &in.EventQPS, &out.EventQPS
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(int32)
+			**out = **in
+		}
+	}
+	if in.MakeIptablesUtilChains != nil {
+		in, out := &in.MakeIptablesUtilChains, &out.MakeIptablesUtilChains
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(bool)
+			**out = **in
+		}
+	}
+	if in.CAdvisorPort != nil {
+		in, out := &in.CAdvisorPort, &out.CAdvisorPort
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(int32)
+			**out = **in
+		}
+	}
+	if in.ProtectKernelDefaults != nil {
+		in, out := &in.ProtectKernelDefaults, &out.ProtectKernelDefaults
+		if *in == nil {
+			*out = nil
+		} else {
+			*out = new(bool)
 			**out = **in
 		}
 	}
