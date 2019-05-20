@@ -18,6 +18,8 @@ FROM k8s.gcr.io/debian-base-amd64:0.2
 RUN echo "deb-src http://security.debian.org/ jessie/updates main" >> /etc/apt/sources.list
 RUN echo "deb-src http://ftp.us.debian.org/debian/ jessie main" >> /etc/apt/sources.list
 
+RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
+
 RUN apt-get update && apt-get install --yes dpkg-dev bash \
   && apt-get build-dep --yes socat conntrack \
   && apt-get clean
