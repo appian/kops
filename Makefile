@@ -1,4 +1,4 @@
-# Copyright 2016 The Kubernetes Authors.
+# Copyright 2019 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ unexport KOPS_BASE_URL KOPS_CLUSTER_NAME KOPS_RUN_OBSOLETE_VERSION KOPS_STATE_ST
 unexport SKIP_REGION_CHECK S3_ACCESS_KEY_ID S3_ENDPOINT S3_REGION S3_SECRET_ACCESS_KEY VSPHERE_USERNAME VSPHERE_PASSWORD
 
 # Keep in sync with upup/models/cloudup/resources/addons/dns-controller/
-DNS_CONTROLLER_TAG=1.11.0-alpha.1
+DNS_CONTROLLER_TAG=1.11.0
 
 # Keep in sync with logic in get_workspace_status
 # TODO: just invoke tools/get_workspace_status.sh?
@@ -486,6 +486,7 @@ dep-ensure: dep-prereqs
 	rm -rf vendor/k8s.io/code-generator/cmd/set-gen/
 	rm -rf vendor/k8s.io/code-generator/cmd/go-to-protobuf/
 	rm -rf vendor/k8s.io/code-generator/cmd/import-boss/
+	rm -rf vendor/github.com/docker/docker/contrib/
 	make bazel-gazelle
 
 
@@ -772,8 +773,14 @@ bazel-version-dist: bazel-crossbuild-nodeup bazel-crossbuild-kops bazel-protokub
 bazel-upload: bazel-version-dist # Upload kops to S3
 	aws s3 sync --acl public-read ${BAZELUPLOAD}/ ${S3_BUCKET}
 
-#-----------------------------------------------------------  
-# static html documentation  
+# prow-postsubmit is run by the prow postsubmit job
+# It uploads a build to a staging directory, which in theory we can publish as a release
+.PHONY: prow-postsubmit
+prow-postsubmit: bazel-version-dist
+	${UPLOAD} ${BAZELUPLOAD}/kops/${VERSION}/ ${UPLOAD_DEST}/${KOPS_RELEASE_VERSION}-${GITSHA}/
+
+#-----------------------------------------------------------
+# static html documentation
 
 .PHONY: live-docs
 live-docs:
@@ -783,8 +790,9 @@ live-docs:
 build-docs:
 	@docker run --rm -it -v ${PWD}:/docs aledbf/mkdocs:0.1 build
 
+# Update machine_types.go
 .PHONY: update-machine-types
-update-machine-types: #Update machine_types.go
-	go build -o hack/machine_types/machine_types  ${KOPS_ROOT}/hack/machine_types/machine_types.go
+update-machine-types:
+	go build -o hack/machine_types/machine_types  ${KOPS_ROOT}/hack/machine_types/
 	hack/machine_types/machine_types --out upup/pkg/fi/cloudup/awsup/machine_types.go
 	go fmt upup/pkg/fi/cloudup/awsup/machine_types.go

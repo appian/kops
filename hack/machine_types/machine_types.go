@@ -152,6 +152,7 @@ func run() error {
 		}
 	}
 
+	seen := map[string]bool{}
 	for _, item := range prices {
 		for k, v := range item {
 			if k == "product" {
@@ -160,6 +161,11 @@ func run() error {
 				for k, v := range product["attributes"].(map[string]interface{}) {
 					attributes[k] = v.(string)
 				}
+
+				if _, ok := seen[attributes["instanceType"]]; ok {
+					continue
+				}
+				seen[attributes["instanceType"]] = true
 
 				machine := awsup.AWSMachineTypeInfo{
 					Name:  attributes["instanceType"],
@@ -189,8 +195,17 @@ func run() error {
 				if attributes["ecu"] == "Variable" {
 					machine.Burstable = true
 					machine.ECU = t2CreditsPerHour[machine.Name] // This is actually credits * ECUs, but we'll add that later
+				} else if attributes["ecu"] == "NA" {
+					machine.ECU = 0
 				} else {
 					machine.ECU = stringToFloat32(attributes["ecu"])
+				}
+
+				if enis, enisOK := InstanceENIsAvailable[attributes["instanceType"]]; enisOK {
+					machine.InstanceENIs = enis
+				}
+				if ipsPerENI, ipsOK := InstanceIPsAvailable[attributes["instanceType"]]; ipsOK {
+					machine.InstanceIPsPerENI = int(ipsPerENI)
 				}
 
 				machines = append(machines, machine)
@@ -230,7 +245,14 @@ func run() error {
 
 	for _, f := range sortedFamilies {
 		output = output + fmt.Sprintf("\n// %s family", f)
+		previousMachine := ""
 		for _, m := range machines {
+			// Ignore duplicates
+			if m.Name == previousMachine {
+				continue
+			}
+			previousMachine = m.Name
+
 			if family := strings.Split(m.Name, ".")[0]; family == f {
 				var ecu string
 				if m.Burstable {
@@ -245,7 +267,9 @@ func run() error {
 		MemoryGB: %v,
 		ECU: %v,
 		Cores: %v,
-	`, m.Name, m.MemoryGB, ecu, m.Cores)
+		InstanceENIs: %v,
+		InstanceIPsPerENI: %v,
+	`, m.Name, m.MemoryGB, ecu, m.Cores, m.InstanceENIs, m.InstanceIPsPerENI)
 				output = output + body
 
 				// Avoid awkward []int(nil) syntax
